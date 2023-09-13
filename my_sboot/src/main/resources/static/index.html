@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Management</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+        }
+
+        h1, h2 {
+            text-align: center;
+            color: #333;
+        }
+
+        form {
+            text-align: center;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+
+        button[type="button"] {
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 3px;
+        }
+
+        button[type="button"]:hover {
+            background-color: #0056b3;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            margin-bottom: 5px;
+            background-color: #f9f9f9;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Employee Management</h1>
+
+        <!-- Form for adding a new employee -->
+        <form id="employeeForm">
+            <label for="id">ID:</label>
+            <input type="text" id="id" name="id" required>
+            <br>
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" required>
+            <br>
+            <button type="button" onclick="saveEmployee()">Save Employee</button>
+        </form>
+
+        <hr>
+
+        <!-- Display list of employees -->
+        <h2>Employee List</h2>
+        <ul id="employeeList">
+            <!-- Employee list items will be added here using JavaScript -->
+        </ul>
+    </div>
+
+    <script>
+        // Function to save an employee
+        function saveEmployee() {
+            const id = document.getElementById('id').value;
+            const name = document.getElementById('name').value;
+
+            // Make a POST request to save the employee
+            fetch('http://localhost:3002/employee/save', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ id, name }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Employee saved:', data);
+                // Clear the form fields after saving
+                document.getElementById('id').value = '';
+                document.getElementById('name').value = '';
+                // Refresh the employee list
+                fetchEmployeeList();
+            })
+            .catch(error => {
+                console.error('Error saving employee:', error);
+            });
+        }
+
+        // Function to fetch and display the list of employees
+        function fetchEmployeeList() {
+            // Make a GET request to retrieve all employees
+            fetch('http://localhost:3002/employee/all')
+            .then(response => response.json())
+            .then(data => {
+                const employeeList = document.getElementById('employeeList');
+                // Clear the existing list
+                employeeList.innerHTML = '';
+                // Add each employee as a list item
+                data.forEach(employee => {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = `ID: ${employee.id}, Name: ${employee.name}`;
+                    employeeList.appendChild(listItem);
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching employee list:', error);
+            });
+        }
+
+        // Initial fetch of the employee list
+        fetchEmployeeList();
+    </script>
+</body>
+</html>
